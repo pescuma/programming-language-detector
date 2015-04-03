@@ -334,7 +334,7 @@
 
 	<import file="ivy.xml" />
 
-	<target name="mvn-generate-pom" depends="install-ivy" description="Generate POM for maven">
+	<target name="mvn-generate-pom" depends="install-ivy">
 		<delete dir="${dist.dir}/maven" quiet="true" />
 		<mkdir dir="${dist.dir}/maven" />
 
