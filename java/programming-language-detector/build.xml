@@ -1,7 +1,7 @@
 <project name="programming-language-detector" default="all">
 
 	<property name="project" value="programming-language-detector" />
-	<property name="version" value="0.1" />
+	<property name="version" value="0.2" />
 
 	<import file="ivy.xml" />
 	<import file="project.xml" />
