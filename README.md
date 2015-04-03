@@ -14,7 +14,7 @@ FilenameToLanguage.detectLanguage("build.xml") == "Ant"
 
 To detect the type of one line inside the file:
 ```java
-SimpleFileParser parser = new SimpleFileParser("abc.java");
+SimpleFileParser parser = new SimpleFileParser("Java");
 parser.feedNextLine("{") == SimpleFileParser.LineType.Code;
 parser.feedNextLine("    ") == SimpleFileParser.LineType.Empty;
 parser.feedNextLine("//a") == SimpleFileParser.LineType.Comment;

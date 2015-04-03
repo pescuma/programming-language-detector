@@ -21,6 +21,7 @@ public class FilenameToLanguage {
 		extensions.put("ample", "AMPLE");
 		extensions.put("dofile", "AMPLE");
 		extensions.put("startup", "AMPLE");
+		extensions.put("build.xml", "Ant");
 		extensions.put("trigger", "Apex Trigger");
 		extensions.put("ino", "Arduino Sketch");
 		extensions.put("pde", "Arduino Sketch");
@@ -97,7 +98,6 @@ public class FilenameToLanguage {
 		extensions.put("idl", "IDL");
 		extensions.put("pro", "IDL");
 		extensions.put("ism", "InstallShield");
-		extensions.put("jar", "Java");
 		extensions.put("java", "Java");
 		extensions.put("js", "Javascript");
 		extensions.put("jsf", "JavaServer Faces");
@@ -113,7 +113,7 @@ public class FilenameToLanguage {
 		extensions.put("lsp", "Lisp");
 		extensions.put("sc", "Lisp");
 		extensions.put("scm", "Lisp");
-		extensions.put("cl", "Lisp/OpenCL");
+		extensions.put("cl", "Lisp or OpenCL");
 		extensions.put("oscript", "LiveLink OScript");
 		extensions.put("lua", "Lua");
 		extensions.put("ac", "m4");
@@ -122,11 +122,9 @@ public class FilenameToLanguage {
 		extensions.put("gnumakefile", "make");
 		extensions.put("makefile", "make");
 		extensions.put("Makefile", "make");
-		extensions.put("m", "MATLAB/Objective C/MUMPS");
+		extensions.put("m", "MATLAB or Objective C or MUMPS");
 		extensions.put("pom", "Maven");
 		extensions.put("pom.xml", "Maven");
-		extensions.put("ml", "ML");
-		extensions.put("mli", "ML");
 		extensions.put("i3", "Modula3");
 		extensions.put("ig", "Modula3");
 		extensions.put("m3", "Modula3");
@@ -139,8 +137,8 @@ public class FilenameToLanguage {
 		extensions.put("build", "NAnt scripts");
 		extensions.put("dmap", "NASTRAN DMAP");
 		extensions.put("mm", "Objective C++");
-		extensions.put("ml", "OCaml");
-		extensions.put("mli", "OCaml");
+		extensions.put("ml", "OCaml or ML");
+		extensions.put("mli", "OCaml or ML");
 		extensions.put("mll", "OCaml");
 		extensions.put("mly", "OCaml");
 		extensions.put("glsl", "OpenGL Shading Language");
@@ -230,7 +228,7 @@ public class FilenameToLanguage {
 	
 	private static final Map<String, String> binaryExtensions = new HashMap<String, String>();
 	static {
-		extensions.put("jar", "Java");
+		binaryExtensions.put("jar", "Java");
 	};
 	
 	private static final Map<String, String> filenames = new HashMap<String, String>();
@@ -248,7 +246,7 @@ public class FilenameToLanguage {
 	
 	public static String detectLanguage(String filename, boolean includeBinaries) {
 		if (filename == null)
-			return "";
+			return null;
 		
 		String result = filenames.get(getName(filename).toLowerCase(Locale.ENGLISH));
 		if (result != null)
@@ -269,12 +267,12 @@ public class FilenameToLanguage {
 			if (result != null)
 				return result;
 			
-			result = extensions.get(extension);
+			result = binaryExtensions.get(extension);
 			if (result != null)
 				return result;
 		}
 		
-		return "";
+		return null;
 	}
 	
 	private static String getName(String filename) {
@@ -294,7 +292,7 @@ public class FilenameToLanguage {
 		if (pos < 0)
 			return "";
 		
-		pos = filename.lastIndexOf('.', pos);
+		pos = filename.lastIndexOf('.', pos - 1);
 		if (pos < 0)
 			return "";
 		
@@ -306,6 +304,6 @@ public class FilenameToLanguage {
 	}
 	
 	public static boolean isKnownFileType(String filename, boolean includeBinaries) {
-		return !detectLanguage(filename, includeBinaries).isEmpty();
+		return detectLanguage(filename, includeBinaries) != null;
 	}
 }
