@@ -1,5 +1,9 @@
 package org.pescuma.programminglanguagedetector;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -10,145 +14,63 @@ public class SimpleFileParser {
 	// Based on cloc.pl : Copyright (C) 2006-2013 Northrop Grumman Corporation
 	// Based on https://code.google.com/p/gitinspector/source/browse/gitinspector/comment.py
 	
+	public static LineCount countLines(File file) throws IOException {
+		FileReader fileReader = null;
+		BufferedReader reader = null;
+		try {
+			fileReader = new FileReader(file);
+			reader = new BufferedReader(fileReader);
+			
+			String language = FilenameToLanguage.detectLanguage(file);
+			SimpleFileParser parser = new SimpleFileParser(language);
+			LineCount result = new LineCount();
+			
+			String line;
+			while ((line = reader.readLine()) != null) {
+				switch (parser.feedNextLine(line)) {
+					case Comment:
+						result.commentLines++;
+						break;
+					case Empty:
+						result.emptyLines++;
+						break;
+					case Code:
+						result.codeLines++;
+						break;
+					default:
+						throw new UnsupportedOperationException();
+				}
+			}
+			
+			return result;
+			
+		} finally {
+			if (reader != null) {
+				try {
+					reader.close();
+				} catch (IOException e) {
+				}
+			}
+			
+			if (fileReader != null) {
+				try {
+					fileReader.close();
+				} catch (IOException e) {
+				}
+			}
+		}
+	}
+	
+	public static class LineCount {
+		public int emptyLines;
+		public int commentLines;
+		public int codeLines;
+	}
+	
 	public enum LineType {
 		Empty,
 		Comment,
 		Code
-	}
-	
-	private static Map<String, Language> languages = new HashMap<String, Language>();
-	static {
-		languages.put("ABAP", new Language("\"").addLineComment("*", true));
-		languages.put("ActionScript", new Language("/*", "*/", "//"));
-		languages.put("Ada", new Language("--"));
-		languages.put("ADSO/IDSM", new Language("*+").addLineComment("*!"));
-		languages.put("AMPLE", new Language("//"));
-		languages.put("Ant", new Language("<!--", "-->"));
-		languages.put("Apex Trigger", new Language("/*", "*/", "//"));
-		languages.put("Arduino Sketch", new Language("/*", "*/", "//"));
-		languages.put("ASP", new Language("'"));
-		languages.put("ASP.Net", new Language("/*", "*/", "//").addMultilineComment("<!--", "-->")
-				.addMultilineComment("<%--", "--%>"));
-		languages.put("Assembly", new Language("/*", "*/", "//").addLineComment(";"));
-		languages.put("AutoHotkey", new Language(";"));
-		languages.put("awk", new Language("#"));
-		languages.put("Bourne Again Shell", new Language("#"));
-		languages.put("Bourne Shell", new Language("#"));
-		languages.put("C", new Language("/*", "*/", "//"));
-		languages.put("C Shell", new Language("#"));
-		languages.put("C#", new Language("/*", "*/", "//"));
-		languages.put("C++", new Language("/*", "*/", "//"));
-		languages.put("C/C++ Header", new Language("/*", "*/", "//"));
-		languages.put("CCS", new Language("/*", "*/", "//"));
-		languages.put("Clojure", new Language(";"));
-		languages.put("ClojureScript", new Language(";"));
-		languages.put("CMake", new Language("#"));
-		// TODO languages.put("COBOL", new Language());
-		languages.put("CoffeeScript", new Language("#"));
-		languages.put("ColdFusion", new Language("<!--", "-->"));
-		languages.put("ColdFusion CFScript", new Language("/*", "*/", "//"));
-		languages.put("CSS", new Language("/*", "*/", "//"));
-		languages.put("Cython", new Language("\"\"\"", "\"\"\"", "#"));
-		languages.put("D", new Language("/*", "*/", "//").addMultilineComment("/+", "+/"));
-		languages.put("DAL", new Language("[", "]"));
-		languages.put("Dart", new Language("/*", "*/", "//"));
-		languages.put("DOS Batch", new Language("rem"));
-		languages.put("DTD", new Language("<!--", "-->"));
-		languages.put("Erlang", new Language("%"));
-		languages.put("Expect", new Language("#"));
-		languages.put("F#", new Language("(*", "*)", "//")); // TODO Nested comments
-		languages.put("Focus", new Language("-*"));
-		languages.put("Fortran 77", new Language("!"));
-		languages.put("Fortran 90",
-				new Language("!").addLineComment("*", true).addLineComment("c", true)
-						.addLineComment("C", true));
-		languages.put("Fortran 95",
-				new Language("!").addLineComment("*", true).addLineComment("c", true)
-						.addLineComment("C", true).addCodeLine("!hpf").addCodeLine("!omp"));
-		languages.put("GNU Gettext", new Language("#"));
-		languages.put("Go", new Language("/*", "*/", "//"));
-		languages.put("Groovy", new Language("/*", "*/", "//"));
-		languages.put("Haskell", new Language("{-", "-}", "--"));
-		languages.put("HTML", new Language("<!--", "-->"));
-		languages.put("IDL", new Language(";"));
-		languages.put("InstallShield", new Language("<!--", "-->"));
-		languages.put("Java", new Language("/*", "*/", "//"));
-		languages.put("Javascript", new Language("/*", "*/", "//"));
-		languages.put("JavaServer Faces", new Language("/*", "*/", "//"));
-		languages.put("JCL", new Language("//*"));
-		languages.put("JSP", new Language("/*", "*/", "//").addMultilineComment("<!--", "-->")
-				.addMultilineComment("<%--", "--%>"));
-		languages.put("Kermit", new Language("#").addLineComment(";"));
-		languages.put("Korn Shell", new Language("#"));
-		languages.put("LESS", new Language("/*", "*/", "//"));
-		languages.put("lex", new Language("/*", "*/", "//"));
-		languages.put("Lisp", new Language(";"));
-		languages.put("LiveLink OScript", new Language("//"));
-		languages.put("Lua", new Language("--"));
-		languages.put("m4", new Language("dnl "));
-		languages.put("make", new Language("#"));
-		languages.put("MATLAB", new Language("%"));
-		languages.put("Maven", new Language("<!--", "-->"));
-		languages.put("ML", new Language("(*", "*)"));
-		languages.put("Modula3", new Language("(*", "*)"));
-		languages.put("MSBuild scripts", new Language("<!--", "-->"));
-		languages.put("MUMPS", new Language(";"));
-		languages.put("MXML", new Language("/*", "*/", "//").addMultilineComment("<!--", "-->"));
-		languages.put("NAnt scripts", new Language("<!--", "-->"));
-		languages.put("NASTRAN DMAP", new Language("$"));
-		languages.put("Objective C", new Language("/*", "*/", "//"));
-		languages.put("Objective C++", new Language("/*", "*/", "//"));
-		languages.put("OCaml", new Language("(*", "*)", "//").addMultilineComment("{", "}"));
-		languages.put("OpenCL", new Language("/*", "*/", "//"));
-		languages.put("OpenGL Shading Language", new Language("/*", "*/", "//"));
-		languages.put("Oracle Forms", new Language("/*", "*/", "//"));
-		languages.put("Oracle Reports", new Language("/*", "*/", "//"));
-		languages.put("Pascal", new Language("(*", "*)", "//").addMultilineComment("{", "}"));
-		languages.put("Patran Command Language", new Language("/*", "*/", "//").addLineComment("#")
-				.addLineComment("$#"));
-		languages.put("Perl", new Language("^=head1", "^=cut", "#", true).addMultilineComment(
-				"^__(END|DATA)__", null));
-		languages.put("PHP", new Language("/*", "*/", "//").addLineComment("#"));
-		languages.put("Pig Latin", new Language("/*", "*/", "//").addLineComment("--"));
-		languages.put("PowerShell", new Language("<#", "#>", "#"));
-		languages.put("Python", new Language("\"\"\"", "\"\"\"", "#"));
-		languages.put("QML", new Language("/*", "*/", "//"));
-		languages.put("Razor", new Language("/*", "*/", "//").addMultilineComment("@*", "*@"));
-		languages.put("Rexx", new Language("/*", "*/", "//"));
-		languages.put("Ruby", new Language("=begin", "=end", "#", true));
-		languages.put("Ruby HTML", new Language("<!--", "-->"));
-		languages.put("Rust", new Language("/*", "*/", "//"));
-		languages.put("SASS", new Language("/*", "*/", "//"));
-		languages.put("Scala", new Language("/*", "*/", "//"));
-		languages.put("sed", new Language("#"));
-		languages.put("SKILL", new Language("/*", "*/", "//").addLineComment(";"));
-		languages.put("SKILL++", new Language("/*", "*/", "//").addLineComment(";"));
-		languages.put("Smarty", new Language("{*", "*}"));
-		languages.put("Softbridge Basic",
-				new Language(null, "Attribute VB_Name =", "'").addLineComment("Attribute "));
-		languages.put("SQL", new Language("/*", "*/", "--"));
-		languages.put("SQL Data", new Language("/*", "*/", "--"));
-		languages.put("SQL Stored Procedure", new Language("/*", "*/", "--"));
-		languages.put("Tcl/Tk", new Language("#"));
-		languages.put("Teamcenter def", new Language("#"));
-		languages.put("Teamcenter met", new Language("/*", "*/", "//"));
-		languages.put("Teamcenter mth", new Language("#"));
-		languages.put("Tex", new Language("\\begin{comment}", "\\end{comment}", "%", true));
-		languages.put("Vala", new Language("/*", "*/", "//"));
-		languages.put("Vala Header", new Language("/*", "*/", "//"));
-		languages.put("Verilog-SystemVerilog", new Language("/*", "*/", "//"));
-		languages.put("VHDL", new Language("/*", "*/", "//").addLineComment("--"));
-		languages.put("vim script", new Language("\""));
-		languages.put("Visual Basic",
-				new Language(null, "Attribute VB_Name =", "'").addLineComment("Attribute "));
-		languages.put("Visualforce Component", new Language("<!--", "-->"));
-		languages.put("Visualforce Page", new Language("<!--", "-->"));
-		languages.put("XAML", new Language("<!--", "-->"));
-		languages.put("XML", new Language("<!--", "-->"));
-		languages.put("XSD", new Language("<!--", "-->"));
-		languages.put("XSLT", new Language("<!--", "-->"));
-		languages.put("yacc", new Language("/*", "*/", "//"));
-		languages.put("YAML", new Language("#"));
 	}
 	
 	private final Language language;
@@ -156,10 +78,10 @@ public class SimpleFileParser {
 	private int lineNum = 0;
 	
 	public SimpleFileParser(String languageName) {
-		this(languages.get(languageName));
+		this(languageName != null ? languages.get(languageName) : null);
 	}
 	
-	public SimpleFileParser(Language lang) {
+	SimpleFileParser(Language lang) {
 		language = lang != null ? lang : new Language(null);
 	}
 	
@@ -356,5 +278,140 @@ public class SimpleFileParser {
 			else
 				return lineClean.startsWith(start);
 		}
+	}
+	
+	private static Map<String, Language> languages = new HashMap<String, Language>();
+	static {
+		languages.put("ABAP", new Language("\"").addLineComment("*", true));
+		languages.put("ActionScript", new Language("/*", "*/", "//"));
+		languages.put("Ada", new Language("--"));
+		languages.put("ADSO/IDSM", new Language("*+").addLineComment("*!"));
+		languages.put("AMPLE", new Language("//"));
+		languages.put("Ant", new Language("<!--", "-->"));
+		languages.put("Apex Trigger", new Language("/*", "*/", "//"));
+		languages.put("Arduino Sketch", new Language("/*", "*/", "//"));
+		languages.put("ASP", new Language("'"));
+		languages.put("ASP.Net", new Language("/*", "*/", "//").addMultilineComment("<!--", "-->")
+				.addMultilineComment("<%--", "--%>"));
+		languages.put("Assembly", new Language("/*", "*/", "//").addLineComment(";"));
+		languages.put("AutoHotkey", new Language(";"));
+		languages.put("awk", new Language("#"));
+		languages.put("Bourne Again Shell", new Language("#"));
+		languages.put("Bourne Shell", new Language("#"));
+		languages.put("C", new Language("/*", "*/", "//"));
+		languages.put("C Shell", new Language("#"));
+		languages.put("C#", new Language("/*", "*/", "//"));
+		languages.put("C++", new Language("/*", "*/", "//"));
+		languages.put("C/C++ Header", new Language("/*", "*/", "//"));
+		languages.put("CCS", new Language("/*", "*/", "//"));
+		languages.put("Clojure", new Language(";"));
+		languages.put("ClojureScript", new Language(";"));
+		languages.put("CMake", new Language("#"));
+		// TODO languages.put("COBOL", new Language());
+		languages.put("CoffeeScript", new Language("#"));
+		languages.put("ColdFusion", new Language("<!--", "-->"));
+		languages.put("ColdFusion CFScript", new Language("/*", "*/", "//"));
+		languages.put("CSS", new Language("/*", "*/", "//"));
+		languages.put("Cython", new Language("\"\"\"", "\"\"\"", "#"));
+		languages.put("D", new Language("/*", "*/", "//").addMultilineComment("/+", "+/"));
+		languages.put("DAL", new Language("[", "]"));
+		languages.put("Dart", new Language("/*", "*/", "//"));
+		languages.put("DOS Batch", new Language("rem"));
+		languages.put("DTD", new Language("<!--", "-->"));
+		languages.put("Erlang", new Language("%"));
+		languages.put("Expect", new Language("#"));
+		languages.put("F#", new Language("(*", "*)", "//")); // TODO Nested comments
+		languages.put("Focus", new Language("-*"));
+		languages.put("Fortran 77", new Language("!"));
+		languages.put("Fortran 90",
+				new Language("!").addLineComment("*", true).addLineComment("c", true)
+						.addLineComment("C", true));
+		languages.put("Fortran 95",
+				new Language("!").addLineComment("*", true).addLineComment("c", true)
+						.addLineComment("C", true).addCodeLine("!hpf").addCodeLine("!omp"));
+		languages.put("GNU Gettext", new Language("#"));
+		languages.put("Go", new Language("/*", "*/", "//"));
+		languages.put("Groovy", new Language("/*", "*/", "//"));
+		languages.put("Haskell", new Language("{-", "-}", "--"));
+		languages.put("HTML", new Language("<!--", "-->"));
+		languages.put("IDL", new Language(";"));
+		languages.put("InstallShield", new Language("<!--", "-->"));
+		languages.put("Java", new Language("/*", "*/", "//"));
+		languages.put("Javascript", new Language("/*", "*/", "//"));
+		languages.put("JavaServer Faces", new Language("/*", "*/", "//"));
+		languages.put("JCL", new Language("//*"));
+		languages.put("JSP", new Language("/*", "*/", "//").addMultilineComment("<!--", "-->")
+				.addMultilineComment("<%--", "--%>"));
+		languages.put("Kermit", new Language("#").addLineComment(";"));
+		languages.put("Korn Shell", new Language("#"));
+		languages.put("LESS", new Language("/*", "*/", "//"));
+		languages.put("lex", new Language("/*", "*/", "//"));
+		languages.put("Lisp", new Language(";"));
+		languages.put("LiveLink OScript", new Language("//"));
+		languages.put("Lua", new Language("--"));
+		languages.put("m4", new Language("dnl "));
+		languages.put("make", new Language("#"));
+		languages.put("MATLAB", new Language("%"));
+		languages.put("Maven", new Language("<!--", "-->"));
+		languages.put("ML", new Language("(*", "*)"));
+		languages.put("Modula3", new Language("(*", "*)"));
+		languages.put("MSBuild scripts", new Language("<!--", "-->"));
+		languages.put("MUMPS", new Language(";"));
+		languages.put("MXML", new Language("/*", "*/", "//").addMultilineComment("<!--", "-->"));
+		languages.put("NAnt scripts", new Language("<!--", "-->"));
+		languages.put("NASTRAN DMAP", new Language("$"));
+		languages.put("Objective C", new Language("/*", "*/", "//"));
+		languages.put("Objective C++", new Language("/*", "*/", "//"));
+		languages.put("OCaml", new Language("(*", "*)", "//").addMultilineComment("{", "}"));
+		languages.put("OpenCL", new Language("/*", "*/", "//"));
+		languages.put("OpenGL Shading Language", new Language("/*", "*/", "//"));
+		languages.put("Oracle Forms", new Language("/*", "*/", "//"));
+		languages.put("Oracle Reports", new Language("/*", "*/", "//"));
+		languages.put("Pascal", new Language("(*", "*)", "//").addMultilineComment("{", "}"));
+		languages.put("Patran Command Language", new Language("/*", "*/", "//").addLineComment("#")
+				.addLineComment("$#"));
+		languages.put("Perl", new Language("^=head1", "^=cut", "#", true).addMultilineComment(
+				"^__(END|DATA)__", null));
+		languages.put("PHP", new Language("/*", "*/", "//").addLineComment("#"));
+		languages.put("Pig Latin", new Language("/*", "*/", "//").addLineComment("--"));
+		languages.put("PowerShell", new Language("<#", "#>", "#"));
+		languages.put("Python", new Language("\"\"\"", "\"\"\"", "#"));
+		languages.put("QML", new Language("/*", "*/", "//"));
+		languages.put("Razor", new Language("/*", "*/", "//").addMultilineComment("@*", "*@"));
+		languages.put("Rexx", new Language("/*", "*/", "//"));
+		languages.put("Ruby", new Language("=begin", "=end", "#", true));
+		languages.put("Ruby HTML", new Language("<!--", "-->"));
+		languages.put("Rust", new Language("/*", "*/", "//"));
+		languages.put("SASS", new Language("/*", "*/", "//"));
+		languages.put("Scala", new Language("/*", "*/", "//"));
+		languages.put("sed", new Language("#"));
+		languages.put("SKILL", new Language("/*", "*/", "//").addLineComment(";"));
+		languages.put("SKILL++", new Language("/*", "*/", "//").addLineComment(";"));
+		languages.put("Smarty", new Language("{*", "*}"));
+		languages.put("Softbridge Basic",
+				new Language(null, "Attribute VB_Name =", "'").addLineComment("Attribute "));
+		languages.put("SQL", new Language("/*", "*/", "--"));
+		languages.put("SQL Data", new Language("/*", "*/", "--"));
+		languages.put("SQL Stored Procedure", new Language("/*", "*/", "--"));
+		languages.put("Tcl/Tk", new Language("#"));
+		languages.put("Teamcenter def", new Language("#"));
+		languages.put("Teamcenter met", new Language("/*", "*/", "//"));
+		languages.put("Teamcenter mth", new Language("#"));
+		languages.put("Tex", new Language("\\begin{comment}", "\\end{comment}", "%", true));
+		languages.put("Vala", new Language("/*", "*/", "//"));
+		languages.put("Vala Header", new Language("/*", "*/", "//"));
+		languages.put("Verilog-SystemVerilog", new Language("/*", "*/", "//"));
+		languages.put("VHDL", new Language("/*", "*/", "//").addLineComment("--"));
+		languages.put("vim script", new Language("\""));
+		languages.put("Visual Basic",
+				new Language(null, "Attribute VB_Name =", "'").addLineComment("Attribute "));
+		languages.put("Visualforce Component", new Language("<!--", "-->"));
+		languages.put("Visualforce Page", new Language("<!--", "-->"));
+		languages.put("XAML", new Language("<!--", "-->"));
+		languages.put("XML", new Language("<!--", "-->"));
+		languages.put("XSD", new Language("<!--", "-->"));
+		languages.put("XSLT", new Language("<!--", "-->"));
+		languages.put("yacc", new Language("/*", "*/", "//"));
+		languages.put("YAML", new Language("#"));
 	}
 }

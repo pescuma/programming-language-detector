@@ -7,7 +7,7 @@ import java.util.Map;
 
 public class FilenameToLanguage {
 	
-	// Copied from cloc.pl : Copyright (C) 2006-2013 Northrop Grumman Corporation
+	// Based on cloc.pl : Copyright (C) 2006-2013 Northrop Grumman Corporation
 	
 	private static final Map<String, String> extensions = new HashMap<String, String>();
 	static {
@@ -239,6 +239,10 @@ public class FilenameToLanguage {
 		filenames.put("makefile", "make");
 		filenames.put("pom.xml", "Maven");
 	};
+	
+	public static String detectLanguage(File file) {
+		return detectLanguage(file.getName(), false);
+	}
 	
 	public static String detectLanguage(String filename) {
 		return detectLanguage(filename, false);

@@ -70,8 +70,7 @@ public class SimpleFileBaseTest {
 	
 	@Test
 	public void testMultipleComment_SameLineNoCode() {
-		assertEquals(SimpleFileParser.LineType.Comment,
-				sfp.feedNextLine("  /* x*/\t/*b*/ /* a */"));
+		assertEquals(SimpleFileParser.LineType.Comment, sfp.feedNextLine("  /* x*/\t/*b*/ /* a */"));
 	}
 	
 	@Test
