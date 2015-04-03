@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ivy-module version="2.0" xmlns:e="http://ant.apache.org/ivy/extra">
+	<info organisation="org.pescuma" module="programming-language-detector" />
+
+	<configurations defaultconfmapping="compile->default,sources;runtime->default">
+		<conf name="compile" />
+		<conf name="runtime" />
+	</configurations>
+
+	<publications>
+		<artifact name="programming-language-detector" type="jar" />
+		<artifact name="programming-language-detector" type="pom" />
+		<artifact name="programming-language-detector" type="jar" e:classifier="sources" />
+	</publications>
+
+	<dependencies>
+		<dependency org="junit" name="junit" rev="4.12" conf="compile" />
+	</dependencies>
+</ivy-module>

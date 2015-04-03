@@ -1,0 +1,17 @@
+<project name="programming-language-detector" default="all">
+
+	<property name="project" value="programming-language-detector" />
+	<property name="version" value="0.1" />
+
+	<import file="ivy.xml" />
+	<import file="project.xml" />
+
+	<property name="build.dir" value="${basedir}/build" />
+	<property name="build.tmp.dir" value="${build.dir}/tmp" />
+
+	<taskdef resource="net/sf/antcontrib/antlib.xml" classpath="${basedir}/lib/build/ant-contrib-1.0b3.jar" />
+
+	<target name="all" description="Compile, test, pack and report" depends="init, clean, deps, compile, test, pack, clean-tmp, report">
+	</target>
+
+</project>
