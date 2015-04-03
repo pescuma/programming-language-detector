@@ -244,7 +244,7 @@ public class FilenameToLanguage {
 	};
 	
 	public static String detectLanguage(String filename) {
-		return detectLanguage(filename, true);
+		return detectLanguage(filename, false);
 	}
 	
 	public static String detectLanguage(String filename, boolean includeBinaries) {
@@ -303,7 +303,7 @@ public class FilenameToLanguage {
 	}
 	
 	public static boolean isKnownFileType(String filename) {
-		return isKnownFileType(filename, true);
+		return isKnownFileType(filename, false);
 	}
 	
 	public static boolean isKnownFileType(String filename, boolean includeBinaries) {
