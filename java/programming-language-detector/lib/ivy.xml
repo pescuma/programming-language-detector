@@ -11,7 +11,7 @@
 	<publications>
 		<artifact name="programming-language-detector" type="jar" />
 		<artifact name="programming-language-detector" type="pom" />
-		<artifact name="programming-language-detector" type="sources" ext="jar" e:classifier="sources" />
+		<artifact name="programming-language-detector" type="source" ext="jar" e:classifier="source" />
 	</publications>
 
 	<dependencies>
