@@ -2,15 +2,16 @@
 <ivy-module version="2.0" xmlns:e="http://ant.apache.org/ivy/extra">
 	<info organisation="org.pescuma" module="programming-language-detector" />
 
-	<configurations defaultconfmapping="compile->default,sources;runtime->default">
-		<conf name="compile" />
-		<conf name="runtime" />
+	<configurations defaultconfmapping="compile->default,sources;default->default;sources->sources">
+		<conf name="compile" visibility="private" />
+		<conf name="default" />
+		<conf name="sources" />
 	</configurations>
 
 	<publications>
 		<artifact name="programming-language-detector" type="jar" />
 		<artifact name="programming-language-detector" type="pom" />
-		<artifact name="programming-language-detector" type="jar" e:classifier="sources" />
+		<artifact name="programming-language-detector" type="sources" ext="jar" e:classifier="sources" />
 	</publications>
 
 	<dependencies>
