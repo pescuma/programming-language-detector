@@ -1,6 +1,6 @@
 <project name="programming-language-detector" default="all">
 
-	<property name="version" value="0.2" />
+	<property name="version" value="0.3" />
 	<property name="ivy.publish.root"
 	          value="https://api.bintray.com/maven/pescuma/programming-language-detector/programming-language-detector" />
 
