@@ -141,6 +141,12 @@ public class FilenameToLanguage {
 		extensions.put("mli", "OCaml or ML");
 		extensions.put("mll", "OCaml");
 		extensions.put("mly", "OCaml");
+		extensions.put("comp", "OpenGL Shading Language");
+		extensions.put("frag", "OpenGL Shading Language");
+		extensions.put("geom", "OpenGL Shading Language");
+		extensions.put("tese", "OpenGL Shading Language");
+		extensions.put("tesc", "OpenGL Shading Language");
+		extensions.put("vert", "OpenGL Shading Language");
 		extensions.put("glsl", "OpenGL Shading Language");
 		extensions.put("fmt", "Oracle Forms");
 		extensions.put("rex", "Oracle Reports");
