@@ -54,8 +54,6 @@ public class FilenameToLanguage {
 		extensions.put("cpp", "C++");
 		extensions.put("cxx", "C++");
 		extensions.put("pcc", "C++");
-		extensions.put("vcproj", "C++");
-		extensions.put("vcxproj", "C++");
 		extensions.put("h", "C/C++ Header");
 		extensions.put("hh", "C/C++ Header");
 		extensions.put("hpp", "C/C++ Header");
@@ -131,6 +129,8 @@ public class FilenameToLanguage {
 		extensions.put("mg", "Modula3");
 		extensions.put("csproj", "MSBuild scripts");
 		extensions.put("vbproj", "MSBuild scripts");
+		extensions.put("vcproj", "MSBuild scripts");
+		extensions.put("vcxproj", "MSBuild scripts");
 		extensions.put("wdproj", "MSBuild scripts");
 		extensions.put("mps", "MUMPS");
 		extensions.put("mxml", "MXML");
