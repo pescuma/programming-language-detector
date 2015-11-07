@@ -240,6 +240,8 @@ public class FilenameToLanguage {
 	private static final Map<String, String> filenames = new HashMap<String, String>();
 	static {
 		filenames.put("build.xml", "Ant");
+		filenames.put("ivy.xml", "Ant");
+		filenames.put("ivysettings.xml", "Ant");
 		filenames.put("cmakelists.txt", "CMake");
 		filenames.put("gnumakefile", "make");
 		filenames.put("makefile", "make");
